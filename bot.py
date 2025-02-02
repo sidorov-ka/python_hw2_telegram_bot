@@ -1,40 +1,56 @@
-import logging
 import asyncio
+from utils.config import TELEGRAM_BOT_TOKEN
 from aiogram import Bot, Dispatcher
-from aiogram.types import BotCommand
-from config import API_TOKEN
-from handlers.profile import register_profile_handlers
-from handlers.food import register_food_handlers
-from handlers.water import register_water_handlers
-from handlers.workout import register_workout_handlers
-from handlers.progress import register_progress_handlers  # Новый импорт
-from middlewares.logging import LogMiddleware
+from aiogram.enums import ParseMode
+from aiogram.client.default import DefaultBotProperties
+from aiogram.filters import CommandStart, Command
+from aiogram.types import Message
 
-logging.basicConfig(level=logging.INFO)
+# Инициализируем бота с HTML-разметкой по умолчанию
+bot = Bot(
+    token=TELEGRAM_BOT_TOKEN,
+    default=DefaultBotProperties(parse_mode=ParseMode.HTML)
+)
 
+# Инициализируем диспетчер
+dp = Dispatcher()
+
+# Импортируем роутеры из хендлеров
+from handlers.profile_handlers import router as profile_router
+from handlers.log_handlers import router as log_router
+from handlers.progress_handlers import router as progress_router
+
+# Подключаем роутеры
+dp.include_router(profile_router)
+dp.include_router(log_router)
+dp.include_router(progress_router)
+
+# Обработчик команды /start
+@dp.message(CommandStart())
+async def start(message: Message):
+    await message.answer(
+        "Привет! Я бот для расчёта нормы воды, калорий и трекинга активности.\n"
+        "Используй /help для списка команд."
+    )
+
+# Обработчик команды /help
+@dp.message(Command("help"))
+async def help(message: Message):
+    help_text = """
+<b>Доступные команды:</b>
+/start - Начать работу с ботом
+/help - Получить список команд
+/set_profile - Настроить профиль
+/log_water - Записать потребление воды
+/log_food - Записать потребление еды
+/log_workout - Записать тренировку
+/check_progress - Проверить прогресс
+"""
+    await message.answer(help_text)
+
+# Запуск бота
 async def main():
-    bot = Bot(token=API_TOKEN)
-    dp = Dispatcher()
-
-    # Регистрируем middleware
-    dp.update.middleware(LogMiddleware())
-
-    # Регистрируем хендлеры
-    register_profile_handlers(dp)
-    register_food_handlers(dp)
-    register_water_handlers(dp)
-    register_workout_handlers(dp)
-    register_progress_handlers(dp)
-
-    # Устанавливаем команды бота
-    await bot.set_my_commands([
-        BotCommand(command="start", description="Запустить бота"),
-        BotCommand(command="help", description="Помощь"),
-        BotCommand(command="progress", description="Ваш дневной прогресс"),  # Новая команда
-    ])
-
-    # Запускаем бота
-    await dp.start_polling(bot, skip_updates=True)
+    await dp.start_polling(bot)
 
 if __name__ == "__main__":
     asyncio.run(main())

@@ -1,0 +1,32 @@
+{
+    "1752639129": {
+        "weight": 94.0,
+        "height": 175.0,
+        "age": 40,
+        "activity": 60,
+        "city": "Moscow",
+        "temperature": 1.55,
+        "logged_water": 2000.0,
+        "logged_calories": 1596.0,
+        "burned_calories": 460.6
+    },
+    "1727713753": {
+        "weight": 40.0,
+        "height": 160.0,
+        "age": 43,
+        "activity": 60,
+        "city": "Moscow",
+        "logged_water": 1000.0,
+        "logged_calories": 718.0,
+        "burned_calories": 400
+    },
+    "636530442": {
+        "weight": 1000.0,
+        "height": 67.0,
+        "age": 77,
+        "activity": 90,
+        "city": "Moscow",
+        "logged_water": 1000.0,
+        "logged_calories": 744.8000000000001
+    }
+}

@@ -1,26 +1,29 @@
 import requests
-import os
-from dotenv import load_dotenv
+from utils.config import WEATHER_API_KEY
 
-load_dotenv()
-
-API_KEY = os.getenv("OPENWEATHER_API_KEY")
 BASE_URL = "http://api.openweathermap.org/data/2.5/weather"
 
+def fetch_temperature(city: str) -> tuple:
+    """
+    Получает температуру.
+    :param city: Название города.
+    :return: Кортеж (город, температура) или (город, None) в случае ошибки.
+    """
+    url = f"{BASE_URL}?q={city}&units=metric&APPID={WEATHER_API_KEY}"
 
-def get_weather(city: str) -> dict:
-    """Получаем погоду для заданного города"""
-    params = {
-        "q": city,
-        "appid": API_KEY,
-        "units": "metric",  # Температура в градусах Цельсия
-    }
-    response = requests.get(BASE_URL, params=params)
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Проверяем, есть ли ошибки в ответе
 
-    if response.status_code == 200:
-        return response.json()  # Возвращаем JSON с данными о погоде
-    else:
-        return {"error": "Unable to fetch weather data"}
+        data = response.json()
 
-# Пример использования:
-# weather_data = get_weather("Moscow")
+        # Извлекаем нужные данные
+        if 'main' in data and 'temp' in data['main']:
+            temperature = data['main']['temp']
+            return city, temperature
+        else:
+            return city, None
+
+    except requests.exceptions.RequestException as e:
+        print(f"Ошибка при запросе к API: {e}")
+        return city, None
