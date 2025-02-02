@@ -77,7 +77,8 @@ async def process_city(message: Message, state: FSMContext):
     city, temperature = fetch_temperature(city)
 
     if temperature is None:
-        await message.answer("⚠ Не удалось получить температуру для этого города. Попробуйте другой город.")
+        await message.answer("⚠ Не удалось получить температуру для этого города. "
+                             "Убедитесь, что название на английском языке (например, Moscow).")
         return
 
     user_data = await state.get_data()

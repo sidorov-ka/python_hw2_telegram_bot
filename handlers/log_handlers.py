@@ -67,7 +67,8 @@ async def log_food_name(message: Message, state: FSMContext):
         await state.set_state(FoodStates.quantity)
     except Exception as e:
         logging.error(f"Ошибка Nutritionix API: {e}")
-        await message.answer("⚠ Ошибка при получении данных. Попробуйте позже.")
+        await message.answer("⚠ Ошибка при получении данных. "
+                             "Убедитесь, что название на английском языке (например, banana).")
         await state.clear()
 
 
